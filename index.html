@@ -1,0 +1,188 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>¿Quieres ser mi novia? 💕</title>
+    <style>
+        /* --- ESTILOS PRINCIPALES (CSS) --- */
+        body {
+            margin: 0;
+            padding: 0;
+            background-color: #ffe4e1; /* Fondo rosado pastel */
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            overflow: hidden;
+            text-align: center;
+            user-select: none; /* Evita que se seleccione el texto azul al presionar rápido */
+        }
+
+        .container {
+            max-width: 500px;
+            padding: 20px;
+        }
+
+        h1 {
+            color: #d147a3;
+            font-size: 2.5rem;
+            margin-bottom: 20px;
+            text-shadow: 1px 1px 2px rgba(0,0,0,0.1);
+        }
+
+        .gif-container img {
+            width: 230px;
+            height: auto;
+            border-radius: 15px;
+            margin-bottom: 20px;
+        }
+
+        .buttons-container {
+            display: flex;
+            justify-content: center;
+            gap: 60px; /* 🚀 SOLUCIÓN: Espaciado perfecto entre los dos botones */
+            position: relative;
+            height: 60px;
+            align-items: center;
+        }
+
+        button {
+            padding: 15px 30px;
+            font-size: 1.2rem;
+            font-weight: bold;
+            border: none;
+            border-radius: 25px;
+            cursor: pointer;
+            transition: transform 0.2s ease;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+        }
+
+        #btn-si {
+            background-color: #ff4d94;
+            color: white;
+            z-index: 10; /* Asegura que el botón SÍ esté siempre al frente */
+        }
+
+        #btn-si:hover {
+            transform: scale(1.1);
+        }
+
+        #btn-no {
+            background-color: #999;
+            color: white;
+            /* 🚀 SOLUCIÓN: Eliminamos el absolute inicial para que no se encime */
+            transition: all 0.1s ease; /* Movimiento fluido */
+            z-index: 5;
+        }
+
+        /* Clase oculta para la pantalla final */
+        .hidden {
+            display: none !important;
+        }
+    </style>
+</head>
+<body>
+
+    <audio id="musica-fondo" loop>
+        <source src="ed-sheeran-perfect-official-music-video_btSeSB5u.mp3" type="audio/mpeg">
+        Tu navegador no soporta el elemento de audio.
+    </audio>
+
+    <div id="pantalla-pregunta" class="container">
+        <h1 id="titulo">¿Quieres ser mi novia?</h1>
+        <div class="gif-container">
+            <img id="gif-principal" src="https://media.tenor.com/ZhNxfL0GmoMAAAAi/mocha-bear-hearts.gif" alt="Ositos tiernos">
+        </div>
+        <div class="buttons-container">
+            <button id="btn-si">¡SÍ! 💖</button>
+            <button id="btn-no">No 💔</button>
+        </div>
+    </div>
+
+    <div id="pantalla-exito" class="container hidden">
+        <h1>¡Sabía que dirías que sí! <br> Te amo muchisimo </h1>
+        <div class="gif-container">
+            <img src="https://media.tenor.com/8DHkW1uWDHsAAAAi/milk-and-mocha.gif" alt="Ositos celebrando">
+        </div>
+    </div>
+
+    <script>
+        const btnNo = document.getElementById('btn-no');
+        const btnSi = document.getElementById('btn-si');
+        const pantallaPregunta = document.getElementById('pantalla-pregunta');
+        const pantallaExito = document.getElementById('pantalla-exito');
+        const musica = document.getElementById('musica-fondo'); // Referencia al reproductor
+        let respondido = false;
+
+        // 🚀 FUNCIÓN: Fuerza pantalla completa e inicia la música integrada al mismo tiempo
+        function activarPantallaCompletaYMusica() {
+            // Intentar reproducir la música de Ed Sheeran
+            musica.play().catch(error => {
+                console.log("Interacción requerida por el navegador bloqueada: ", error);
+            });
+
+            // Forzar Pantalla Completa
+            const docElm = document.documentElement;
+            if (docElm.requestFullscreen) {
+                docElm.requestFullscreen();
+            } else if (docElm.mozRequestFullScreen) { /* Firefox */
+                docElm.mozRequestFullScreen();
+            } else if (docElm.webkitRequestFullScreen) { /* Chrome, Safari y Opera */
+                docElm.webkitRequestFullScreen();
+            } else if (docElm.msRequestFullscreen) { /* IE/Edge */
+                docElm.msRequestFullscreen();
+            }
+        }
+
+        // El navegador exige interacción del usuario antes de permitir la pantalla completa y el sonido
+        document.body.addEventListener('click', () => {
+            if (!respondido) {
+                activarPantallaCompletaYMusica();
+            }
+        });
+
+        // Bloqueo de intento de cierre o recarga de la pestaña
+        window.onbeforeunload = function() {
+            if (!respondido) {
+                return "¡No puedes salir sin responder! 🐻";
+            }
+        };
+
+        // Función para mover el botón "No" a coordenadas aleatorias
+        function moverBotonNo() {
+            // Calculamos límites de la pantalla para que el botón no se salga
+            const padding = 60;
+            const maxX = window.innerWidth - btnNo.offsetWidth - padding;
+            const maxY = window.innerHeight - btnNo.offsetHeight - padding;
+
+            // Generamos posiciones aleatorias
+            const randomX = Math.floor(Math.random() * maxX);
+            const randomY = Math.floor(Math.random() * maxY);
+
+            // Al activarse el movimiento, pasa a posición fixed para moverse por toda la pantalla
+            btnNo.style.position = 'fixed';
+            btnNo.style.left = `${randomX}px`;
+            btnNo.style.top = `${randomY}px`;
+        }
+
+        // Eventos para el botón "No" (Escritorio y Móvil)
+        btnNo.addEventListener('mouseenter', moverBotonNo); // Al pasar el mouse encima
+        btnNo.addEventListener('touchstart', (e) => {
+            e.preventDefault(); // Evita el comportamiento por defecto en móviles
+            moverBotonNo();
+        });
+
+        // Evento para el botón "Sí"
+        btnSi.addEventListener('click', (e) => {
+            e.stopPropagation(); // Evita interferencias con el click del body
+            respondido = true;   // Desactiva el bloqueo de salida de la pestaña
+            
+            // Ocultamos la primera pantalla y mostramos la de éxito
+            pantallaPregunta.classList.add('hidden');
+            pantallaExito.classList.remove('hidden');
+        });
+    </script>
+</body>
+</html>
